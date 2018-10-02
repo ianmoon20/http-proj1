@@ -1,0 +1,35 @@
+{
+  "name": "http-proj1",
+  "version": "1.0.0",
+  "engines": {
+    "node": "8.10.0",
+    "npm": "5.5.1"
+  },
+  "description": "API Powered App",
+  "main": "server.js",
+  "scripts": {
+    "start": "node ./src/server.js",
+    "pretest": "eslint ./src --fix",
+    "test": "echo \"Tests complete\"",
+    "nodemon": "nodemon --watch ./src  --watch ./hosted ./src/server.js",
+    "build": "babel ./client --out-file ./hosted/bundle.js",
+    "watch": "babel --watch ./client --out-file ./hosted/bundle.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ianmoon20/http-proj1.git"
+  },
+  "author": "Ian Moon",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ianmoon20/http-proj1/issues"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "eslint": "^4.5.0",
+    "eslint-config-airbnb": "^15.1.0",
+    "eslint-plugin-import": "^2.7.0",
+    "nodemon": "^1.18.4"
+  }
+}

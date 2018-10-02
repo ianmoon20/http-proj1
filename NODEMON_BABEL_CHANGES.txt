@@ -1,0 +1,21 @@
+- Added a .babelrc file to describe what type of build to do. Babel can do a number of different types of output depending on the version of JS you want.
+
+- installed nodemon, babel-cli and babel-preset-env in the package.json with --save-dev
+
+- added nodemon script in package.json to refresh server on changes
+
+- added build script to manually build our ES6 client JS (in client folder) into ES5 JS (in hosted folder)
+
+- added watch script to automatically build our ES6 client JS (in client folder) into ES5 JS (in hosted folder)
+
+- used our nodemon script to keep watching server code for changes and restart the server
+
+- moved HTML page to hosted folder and updated server code to send that file instead
+
+- removed JS from HTML page and put into separate JS file in client folder
+
+- used our build/watch script to build ES5 JS file in hosted folder
+
+- Added link to our HTML page to ask for the build script
+
+- setup URL in server to send back the hosted ES5 JS file when the HTML asks for it
