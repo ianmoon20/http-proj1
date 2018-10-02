@@ -3,7 +3,7 @@ const url = require('url');
 const query = require('querystring');
 const htmlHandler = require('./htmlResponses.js');
 const jsonHandler = require('./jsonResponses.js');
-const imageHandler = require('./imageResponses.js');
+//const imageHandler = require('./imageResponses.js');
 
 const port = process.env.PORT || process.env.NODE_PORT || 3000;
 
@@ -13,7 +13,7 @@ const port = process.env.PORT || process.env.NODE_PORT || 3000;
 const urlStruct = {
   '/': htmlHandler.getIndex,
   '/bundle.js': htmlHandler.getBundle,
-  '/uploadImage': imageHandler.addImage,
+  //'/uploadImage': imageHandler.addImage,
   '/success': jsonHandler.success,
   '/badRequest': jsonHandler.badRequest,
   notFound: jsonHandler.notFound,

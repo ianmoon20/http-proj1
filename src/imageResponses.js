@@ -1,4 +1,4 @@
-const images = {};
+/*const images = {};
 
 const respondImage = (request, response, status, object) => {
   response.writeHead(status, {
@@ -15,3 +15,4 @@ const addImage = (request, response, params) => {
 module.exports = {
   addImage,
 };
+*/
