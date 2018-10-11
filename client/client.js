@@ -40,6 +40,8 @@ const parseJSON = (xhr, content, updating) => {
             while(myNode.firstChild) {
                 myNode.removeChild(myNode.firstChild);
             }
+            
+            numMessages = 0;
         }
     } else if(obj.name) {
         const messageContainer = document.createElement('div');
