@@ -35,7 +35,6 @@ const parseJSON = (xhr, content, updating) => {
             numMessages = numMessages + (obj.numMessages-numMessages);
         } else if (numMessages > obj.numMessages) {
             //we've cleared the server... also clear the clients https://stackoverflow.com/questions/3955229/remove-all-child-elements-of-a-dom-node-in-javascript
-            console.log("Hi");
             const myNode = document.querySelector("#item1");
             while(myNode.firstChild) {
                 myNode.removeChild(myNode.firstChild);
