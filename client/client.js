@@ -2,113 +2,127 @@
     Our babel build/watch scripts in the package.json
     will convert this into ES5 and put it into the hosted folder.
 * */
+let numMessages = 0;
 
 const preventDefaults = (e) => {
     e.preventDefault();
     e.stopPropagation();
 };
 
-const highlight = (upload, e) => {
-    upload.classList.add('highlight');
-};
+const parseJSON = (xhr, content, updating) => {
+    const obj = JSON.parse(xhr.response);
+    
+    //Checking to see if we need to update messages
+    if(updating) {
+        if(numMessages < obj.numMessages) {
+            for(let x = numMessages; x < obj.numMessages; x++) {
+                const messageContainer = document.createElement('div');
+                messageContainer.className = "message";
+                const user = document.createElement('p');
+                user.className = "user";
+                user.textContent = `${obj[`${x+1}`].name} (${obj[`${x+1}`].time})`;
+                
 
-const unhighlight = (upload, e) => {
-    upload.classList.remove('highlight');
-};
+                const p = document.createElement('p');
+                p.className = "content";
+                p.textContent = obj[`${x+1}`].messages;
 
-const handleDrop = (e) => {
-    const dt = e.dataTransfer;
-    const files = dt.files;
-
-    handleFiles(files);
-};
-
-const handleFiles = (files) => {
-    // Converting the FileList to an array for iteration
-    files = [...files];
-    files.forEach(uploadFile);
-    files.forEach(previewFile);
-};
-
-const previewFile = (file) => {
-    let reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onloadend = function () {
-        let img = document.createElement('img');
-        img.src = reader.result;
-        img.height = 150;
-        img.width = 150;
-        document.getElementById('gallery').appendChild(img);
-    }
-};
-
-const uploadFile = (file) => {
-    const url = '/uploadImage';
-    const xhr = new XMLHttpRequest();
-    //let formData = new FormData();
-
-    xhr.open('POST', url, true);
-    //xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-    xhr.setRequestHeader('Content-Type', 'image/png');
-
-    //When the file is downloaded
-    xhr.addEventListener('readystatechange', (e) => {
-        console.info(xhr);
-        if (xhr.readyState === 4) {
-            handleResponse(xhr);
+                messageContainer.appendChild(user);
+                messageContainer.appendChild(p);
+                content.appendChild(messageContainer);
+            }
+            //Incrementing the number of messages for comparison with the server when we decide if we need to update
+            numMessages = numMessages + (obj.numMessages-numMessages);
+        } else if (numMessages > obj.numMessages) {
+            //we've cleared the server... also clear the clients https://stackoverflow.com/questions/3955229/remove-all-child-elements-of-a-dom-node-in-javascript
+            console.log("Hi");
+            const myNode = document.querySelector("#item1");
+            while(myNode.firstChild) {
+                myNode.removeChild(myNode.firstChild);
+            }
         }
-    });
-
-    console.log(file);
-    //xhr.send(formData);
-    xhr.send(file);
-};
-
-const handleResponse = (xhr) => {
-    const content = document.querySelector('#content');
-
-    console.dir(xhr.response);
-
-    switch (xhr.status) {
-        case 200:
-            content.innerHTML = '<b>Success</b>';
-            break;
-        case 201:
-            content.innerHTML = '<b>Create</b>';
-            break;
-        case 400:
-            content.innerHTML = '<b>Bad Request</b>';
-            break;
-        case 404:
-            content.innerHTML = '<b>Resource Not Found</b>';
-            break;
-        default:
-            content.innerHTML = '<b>Error code not implemented by client.<b>';
-            break;
+    } else if(obj.name) {
+        const messageContainer = document.createElement('div');
+        messageContainer.className = "message";
+        
+        const user = document.createElement('p');
+        user.className = "user";
+        user.textContent = `${obj.name} (${obj.time})`;
+        
+        
+        const p = document.createElement('p');
+        p.className = "content";
+        p.textContent = obj.messages;
+        
+        messageContainer.appendChild(user);
+        messageContainer.appendChild(p);
+        content.appendChild(messageContainer);
+        //Incrementing the number of messages for comparison with the server when we decide if we need to update
+        numMessages += 1;
     }
 };
+
+const handleResponse = (xhr, parseResponse, updating) => {
+    const messageArea = document.querySelector('#item1');
+    
+    if(updating) {
+        parseJSON(xhr, messageArea, true);
+    } else if(parseResponse && xhr.status != 204) {
+        parseJSON(xhr, messageArea);
+    } else if(xhr.status != 204) {
+        console.log('Head Request Recieved');
+    }
+};
+
+const sendPost = (e, messageForm) => {
+    const usernameField = messageForm.querySelector('#nameField');
+    const messageField = messageForm.querySelector('#messageField');
+    
+    const xhr = new XMLHttpRequest();
+    xhr.open('post', '/sendMessage');
+    
+    xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        
+    xhr.setRequestHeader('Accept', 'application/json');
+    
+    xhr.onload = () => handleResponse(xhr, true);
+    
+    const today = new Date();
+    let time = `${today.getHours()}:${today.getMinutes()}:${today.getSeconds()}`;
+    
+    const formData = `time=${time}&name=${usernameField.value}&message=${messageField.value}`;
+    
+    messageField.value = "";
+    
+    xhr.send(formData);
+    
+    e.preventDefault();
+    return false;
+}
+
+const requestUpdate = () => {
+    const xhr = new XMLHttpRequest();
+    
+    xhr.open("get", "/getMessages");
+    
+    xhr.setRequestHeader('Accept', 'application/json');
+    
+    xhr.onload = () => handleResponse(xhr, true, true);
+    
+    xhr.send();
+    
+    setTimeout(requestUpdate, 1000);
+}
 
 const init = () => {
-    const uploadSection = document.querySelector('#drop-area');
-    // Preventing the defaults of all the events
-  ['dragover', 'drop'].forEach((eventName) => {
-        window.addEventListener(eventName, preventDefaults, false);
-    });
+    const messageForm = document.querySelector('#messageForm');
+        
+    const addMessage = (e) => sendPost(e, messageForm);
+        
+    messageForm.addEventListener('submit', addMessage);
     
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach((eventName) => {
-        uploadSection.addEventListener(eventName, preventDefaults, false);
-    });
-
-    // Highlighting while the form is hovered over
-  ['dragenter', 'dragover'].forEach((eventName) => {
-        uploadSection.addEventListener(eventName, highlight(uploadSection, eventName), false);
-    });
-
-  ['dragleave', 'dragleave'].forEach((eventName) => {
-        uploadSection.addEventListener(eventName, unhighlight(uploadSection, eventName), false);
-    });
-
-    uploadSection.addEventListener('drop', handleDrop, false);
+    //Seeing if we have updates to post
+    setTimeout(requestUpdate, 1000);
 };
 
 window.onload = init;

@@ -1,118 +1,134 @@
 'use strict';
 
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-
 /** #ES6 file to be converted into an ES5 file
     Our babel build/watch scripts in the package.json
     will convert this into ES5 and put it into the hosted folder.
 * */
+var numMessages = 0;
 
 var preventDefaults = function preventDefaults(e) {
     e.preventDefault();
     e.stopPropagation();
 };
 
-var highlight = function highlight(upload, e) {
-    upload.classList.add('highlight');
-};
+var parseJSON = function parseJSON(xhr, content, updating) {
+    var obj = JSON.parse(xhr.response);
 
-var unhighlight = function unhighlight(upload, e) {
-    upload.classList.remove('highlight');
-};
+    //Checking to see if we need to update messages
+    if (updating) {
+        if (numMessages < obj.numMessages) {
+            for (var x = numMessages; x < obj.numMessages; x++) {
+                var messageContainer = document.createElement('div');
+                messageContainer.className = "message";
+                var user = document.createElement('p');
+                user.className = "user";
+                user.textContent = obj['' + (x + 1)].name + ' (' + obj['' + (x + 1)].time + ')';
 
-var handleDrop = function handleDrop(e) {
-    var dt = e.dataTransfer;
-    var files = dt.files;
+                var p = document.createElement('p');
+                p.className = "content";
+                p.textContent = obj['' + (x + 1)].messages;
 
-    handleFiles(files);
-};
-
-var handleFiles = function handleFiles(files) {
-    // Converting the FileList to an array for iteration
-    files = [].concat(_toConsumableArray(files));
-    files.forEach(uploadFile);
-    files.forEach(previewFile);
-};
-
-var previewFile = function previewFile(file) {
-    var reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onloadend = function () {
-        var img = document.createElement('img');
-        img.src = reader.result;
-        img.height = 150;
-        img.width = 150;
-        document.getElementById('gallery').appendChild(img);
-    };
-};
-
-var uploadFile = function uploadFile(file) {
-    var url = '/uploadImage';
-    var xhr = new XMLHttpRequest();
-    //let formData = new FormData();
-
-    xhr.open('POST', url, true);
-    //xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-    xhr.setRequestHeader('Content-Type', 'image/png');
-
-    //When the file is downloaded
-    xhr.addEventListener('readystatechange', function (e) {
-        console.info(xhr);
-        if (xhr.readyState === 4) {
-            handleResponse(xhr);
+                messageContainer.appendChild(user);
+                messageContainer.appendChild(p);
+                content.appendChild(messageContainer);
+            }
+            //Incrementing the number of messages for comparison with the server when we decide if we need to update
+            numMessages = numMessages + (obj.numMessages - numMessages);
+        } else if (numMessages > obj.numMessages) {
+            //we've cleared the server... also clear the clients https://stackoverflow.com/questions/3955229/remove-all-child-elements-of-a-dom-node-in-javascript
+            console.log("Hi");
+            var myNode = document.querySelector("#item1");
+            while (myNode.firstChild) {
+                myNode.removeChild(myNode.firstChild);
+            }
         }
-    });
+    } else if (obj.name) {
+        var _messageContainer = document.createElement('div');
+        _messageContainer.className = "message";
 
-    console.log(file);
-    //xhr.send(formData);
-    xhr.send(file);
-};
+        var _user = document.createElement('p');
+        _user.className = "user";
+        _user.textContent = obj.name + ' (' + obj.time + ')';
 
-var handleResponse = function handleResponse(xhr) {
-    var content = document.querySelector('#content');
+        var _p = document.createElement('p');
+        _p.className = "content";
+        _p.textContent = obj.messages;
 
-    console.dir(xhr.response);
-
-    switch (xhr.status) {
-        case 200:
-            content.innerHTML = '<b>Success</b>';
-            break;
-        case 201:
-            content.innerHTML = '<b>Create</b>';
-            break;
-        case 400:
-            content.innerHTML = '<b>Bad Request</b>';
-            break;
-        case 404:
-            content.innerHTML = '<b>Resource Not Found</b>';
-            break;
-        default:
-            content.innerHTML = '<b>Error code not implemented by client.<b>';
-            break;
+        _messageContainer.appendChild(_user);
+        _messageContainer.appendChild(_p);
+        content.appendChild(_messageContainer);
+        //Incrementing the number of messages for comparison with the server when we decide if we need to update
+        numMessages += 1;
     }
 };
 
+var handleResponse = function handleResponse(xhr, parseResponse, updating) {
+    var messageArea = document.querySelector('#item1');
+
+    if (updating) {
+        parseJSON(xhr, messageArea, true);
+    } else if (parseResponse && xhr.status != 204) {
+        parseJSON(xhr, messageArea);
+    } else if (xhr.status != 204) {
+        console.log('Head Request Recieved');
+    }
+};
+
+var sendPost = function sendPost(e, messageForm) {
+    var usernameField = messageForm.querySelector('#nameField');
+    var messageField = messageForm.querySelector('#messageField');
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('post', '/sendMessage');
+
+    xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+    xhr.setRequestHeader('Accept', 'application/json');
+
+    xhr.onload = function () {
+        return handleResponse(xhr, true);
+    };
+
+    var today = new Date();
+    var time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds();
+
+    var formData = 'time=' + time + '&name=' + usernameField.value + '&message=' + messageField.value;
+
+    messageField.value = "";
+
+    xhr.send(formData);
+
+    e.preventDefault();
+    return false;
+};
+
+var requestUpdate = function requestUpdate() {
+    var xhr = new XMLHttpRequest();
+
+    xhr.open("get", "/getMessages");
+
+    xhr.setRequestHeader('Accept', 'application/json');
+
+    xhr.onload = function () {
+        return handleResponse(xhr, true, true);
+    };
+
+    xhr.send();
+
+    setTimeout(requestUpdate, 1000);
+};
+
 var init = function init() {
-    var uploadSection = document.querySelector('#drop-area');
-    // Preventing the defaults of all the events
-    ['dragover', 'drop'].forEach(function (eventName) {
-        window.addEventListener(eventName, preventDefaults, false);
-    });
+    var messageForm = document.querySelector('#messageForm');
 
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(function (eventName) {
-        uploadSection.addEventListener(eventName, preventDefaults, false);
-    });
+    var addMessage = function addMessage(e) {
+        return sendPost(e, messageForm);
+    };
 
-    // Highlighting while the form is hovered over
-    ['dragenter', 'dragover'].forEach(function (eventName) {
-        uploadSection.addEventListener(eventName, highlight(uploadSection, eventName), false);
-    });
+    messageForm.addEventListener('submit', addMessage);
 
-    ['dragleave', 'dragleave'].forEach(function (eventName) {
-        uploadSection.addEventListener(eventName, unhighlight(uploadSection, eventName), false);
-    });
-
-    uploadSection.addEventListener('drop', handleDrop, false);
+    //Seeing if we have updates to post
+    setTimeout(requestUpdate, 1000);
 };
 
 window.onload = init;

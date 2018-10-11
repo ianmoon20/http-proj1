@@ -1,0 +1,78 @@
+html,
+        body {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            background-color: #94618E;
+            font-family: 'Source Sans Pro', sans-serif;
+        }
+        
+        #grid {
+            display: grid;
+            height: 100%;
+            grid-template-columns: 5% 45% 45% 5%;
+            grid-template-rows: 3% 85% 9% 3%;
+            background-color: #416a72;
+        }
+        
+
+        #item1 {
+            background-color: #EDF4ED;
+            overflow-y: auto;
+            grid-area: 2 / 2 / 2 / span 2;
+            box-shadow: 4px 8px 16px rgba(0, 0, 0, .40);
+        }
+
+        #item2 {
+            border-top: solid;
+            border-color: #416a72;
+            background-color: #EDF4ED;
+            grid-area: 3 / 2 / 4 / span 2;
+            box-shadow: 4px 10px 16px rgba(0, 0, 0, .40);
+        }
+        
+        .message {
+            padding-left: 1%;
+        }
+        
+        .user {
+            font-weight: bold;
+            padding-bottom: 0;
+            margin-bottom: 0;
+        }
+        
+        .content {
+            padding-left: 2%;
+            padding-top: 0;
+            margin-top: 0;
+        }
+        
+        form {
+            display: grid;
+            grid-template-columns: 5% 20% 5% 50% 5% 10% 5%;
+        }
+        input:focus, textarea:focus {
+            background: rgba(0,0,0,.05);
+            border-radius: 5px;
+            outline: none;
+        }
+        textarea {
+            border: none;
+            background: none;
+            border-bottom: 2px solid lightgray;
+            resize: none;
+        }
+        #nameField {
+            grid-column: 2 / 2;
+        }
+        #messageField {
+            grid-column: 4 / 4;
+        }
+        #submitButton {
+            grid-column: 6 / 6;
+            width: 100%;
+        }
+        #formContainer {
+            margin-top: 1.5%;
+        }

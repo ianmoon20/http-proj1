@@ -4,82 +4,7 @@
 <head>
     <title>Our simple HTTP server</title>
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro" rel="stylesheet">
-    <style>
-        html,
-        body {
-            height: 100%;
-            width: 100%;
-            margin: 0;
-            padding: 0;
-            background-color: #94618E;
-            font-family: 'Source Sans Pro', sans-serif;
-            
-        }
-        
-        #top {
-            text-align: center;
-            margin: 0 auto;
-        }
-        
-        #drop-area {
-            border: 2px dashed #ccc;
-            border-radius: 20px;
-            height: 100%;
-            width: 50%;
-            font-family: sans-serif;
-            margin: 100px auto;
-            padding: 20px;
-            background-color: #F4DECB;
-        }
-        
-        #drop-area.highlight {
-            border-color: purple;
-        }
-        
-        p {
-            margin-top: 0;
-        }
-        
-        .my-form {
-            margin-bottom: 10px;
-        }
-        
-        #gallery {
-            margin-top: 10px;
-        }
-        
-        #gallery img {
-            width: 150px;
-            margin-bottom: 10px;
-            margin-right: 10px;
-            vertical-align: middle;
-        }
-        
-        .button {
-            display: inline-block;
-            padding: 10px;
-            background: #ccc;
-            cursor: pointer;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-        }
-        
-        .button:hover {
-            background: #ddd;
-        }
-        
-        #fileElem {
-            display: none;
-        }
-        
-        #content {
-            margin-top: 100px;
-            height: auto;
-            font-size: 2em;
-            text-align: center;
-        }
-
-    </style>
+    <link rel="stylesheet" type="text/css" href="/style.css">
     <!-- script to get our new JS bundle from the server -->
     <script src="bundle.js">
 
@@ -88,19 +13,24 @@
 </head>
 
 <body>
-    <section id="top">
-        <div id="drop-area">
-            <form class="my-form" method="POST">
-                <p>Upload images by clicking the button or dragging and dropping them.</p>
-                <input type='file' id="fileElem" multiple accept="image/*" onchange="handleFiles(this.files)">
-                <label class="button" for="fileElem">Select Images</label>
-            </form>
-            <!--<progress id="progress-bar" max=100 value=0></progress>-->
-            <div id="gallery"></div>
+    <div id="grid">
+        <div id="item1">
+            <div class="message">
+                <p class="user">Server</p>
+                <p class="content">Send a message by filing in the text boxes below and hitting send!
+                </p>
+            </div>
         </div>
-    </section>
-    <section id="content">
-    </section>
+        <div id="item2">
+            <div id="formContainer">
+                <form id="messageForm" action="/sendMessage" method="post">
+                    <textarea id="nameField" type="text" name="name" placeholder="Username..." maxlength="12" required></textarea>
+                    <textarea id="messageField" type="text" name="message" placeholder="Message..." rows="2" cols="50" maxlength="140" required></textarea>
+                    <input id="submitButton" type="submit" value="Send">
+                </form>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>

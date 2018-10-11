@@ -1,42 +1,101 @@
-const respondJSON = (request, response, status, object) => {
-  response.writeHead(status, { 'Content-Type': 'application/json' });
+// List of users
+let messages = {};
+let numMessages = 0;
+
+const respond = (request, response, status, object) => {
+  const headers = {
+    'Content-Type': 'application/json',
+  };
+
+  response.writeHead(status, headers);
   response.write(JSON.stringify(object));
   response.end();
 };
 
-const success = (request, response) => {
-  const responseJSON = {
-    message: 'This is a successful response',
-  };
-
-  respondJSON(request, response, 200, responseJSON);
+const respondMeta = (request, response, status) => {
+  response.writeHead(status, { 'Content-Type': 'application/json' });
+  response.end();
 };
 
-const badRequest = (request, response, params) => {
+const getMessages = (request, response) => {
+  // Sending back a list of users
+  messages.numMessages = numMessages;
+
+  // returning a 200
+  respond(request, response, 200, messages);
+};
+
+const clearMessages = (request, response) => {
+  // Sending back a list of users
+  numMessages = 0;
+  messages = {};
+
+  // returning a 200
+  return respondMeta(request, response, 204);
+};
+
+const getMessagesMeta = (request, response) => {
+  respondMeta(request, response, 200);
+};
+
+const addMessage = (request, response, body) => {
+  // Assume fail case
   const responseJSON = {
-    message: 'This request has the required parameters',
+    message: 'Need name and message.',
   };
 
-  if (!params.valid || params.valid !== 'true') {
-    responseJSON.message = 'Missing valid query parameter set to true';
-    responseJSON.id = 'badRequest';
-    return respondJSON(request, response, 400, responseJSON);
+  // If either are missing send back a 400 error
+  if (!body.name || !body.message) {
+    responseJSON.id = 'missingParams';
+    return respond(request, response, 400, responseJSON);
   }
 
-  return respondJSON(request, response, 200, responseJSON);
+  // Assume we have a successful creation
+  let responseCode = 201;
+  numMessages += 1;
+
+
+  // If we already have that user...
+  if (messages[numMessages]) {
+    // We're updating (204 code)
+    responseCode = 204;
+  } else {
+    // Create a new user
+    messages[numMessages] = {};
+  }
+
+  messages[numMessages].name = body.name;
+  messages[numMessages].messages = body.message;
+  messages[numMessages].time = body.time;
+
+  if (responseCode === 201) {
+    responseJSON.message = 'Successfully created user and submitted message.';
+    return respond(request, response, responseCode, messages[numMessages]);
+  }
+
+  // We can't send back data with a 204
+  return respondMeta(request, response, responseCode);
 };
 
 const notFound = (request, response) => {
+  // Creating and returning an error message
   const responseJSON = {
     message: 'The page you are looking for was not found.',
     id: 'notFound',
   };
 
-  respondJSON(request, response, 404, responseJSON);
+  respond(request, response, 404, responseJSON);
+};
+const notFoundMeta = (request, response) => {
+  // No error 4 u
+  respond(request, response, 404);
 };
 
 module.exports = {
-  success,
-  badRequest,
+  getMessages,
+  clearMessages,
+  getMessagesMeta,
+  addMessage,
   notFound,
+  notFoundMeta,
 };
