@@ -109,7 +109,24 @@ const sendPost = (e, messageForm) => {
     xhr.onload = () => handleResponse(xhr, true);
     
     const today = new Date();
-    let time = `${today.getHours()}:${today.getMinutes()}:${today.getSeconds()}`;
+    
+    //Reformatting Hours
+    let hours = today.getHours();
+    let suffix = "AM";
+    if(hours > 12) {
+        hours -= 12;
+        suffix = "PM";
+    }
+    if(minutes < 10) {
+        minutes = "0" + minutes;
+    }
+    
+    //reformating minutes
+    let minutes = today.getMinutes();
+    if(minutes < 10) {
+        minutes = "0" + minutes;
+    }
+    let time = `${hours}:${minutes} ${suffix}`;
     
     const formData = `time=${time}&name=${usernameField.value}&message=${messageField.value}`;
     

@@ -50,12 +50,16 @@ html,
         
         form {
             display: grid;
-            grid-template-columns: 5% 20% 5% 50% 5% 10% 5%;
+            grid-template-columns: 5% 20% 5% 65% 5%;
         }
-        input:focus, textarea:focus {
+
+        #nameField:focus, #messageField:focus {
             background: rgba(0,0,0,.05);
             border-radius: 5px;
             outline: none;
+        }
+        #submitButton {
+            display:none;
         }
         #nameField, #messageField {
             border: none;
@@ -66,10 +70,6 @@ html,
         }
         #messageField {
             grid-column: 4 / 4;
-        }
-        #submitButton {
-            grid-column: 6 / 6;
-            width: 100%;
         }
         #formContainer {
             margin-top: 1.5%;

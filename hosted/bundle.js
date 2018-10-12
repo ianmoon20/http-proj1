@@ -110,7 +110,24 @@ var sendPost = function sendPost(e, messageForm) {
     };
 
     var today = new Date();
-    var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+
+    //Reformatting Hours
+    var hours = today.getHours();
+    var suffix = "AM";
+    if (hours > 12) {
+        hours -= 12;
+        suffix = "PM";
+    }
+    if (minutes < 10) {
+        minutes = "0" + minutes;
+    }
+
+    //reformating minutes
+    var minutes = today.getMinutes();
+    if (minutes < 10) {
+        minutes = "0" + minutes;
+    }
+    var time = hours + ":" + minutes + " " + suffix;
 
     var formData = "time=" + time + "&name=" + usernameField.value + "&message=" + messageField.value;
 
