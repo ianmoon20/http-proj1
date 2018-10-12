@@ -15,6 +15,7 @@ const urlStruct = {
   '/bundle.js': htmlHandler.getBundle,
   '/success': jsonHandler.success,
   '/getMessages': jsonHandler.getMessages,
+  '/findMessages': jsonHandler.findMessages,
   '/badRequest': jsonHandler.badRequest,
   notFound: jsonHandler.notFound,
   '/getMessagesMeta': jsonHandler.getMessagesMeta,
@@ -23,6 +24,7 @@ const urlStruct = {
 
 const onRequest = (request, response) => {
   const parsedURL = url.parse(request.url);
+  const params = query.parse(parsedURL.query);
   switch (request.method) {
     case 'POST':
       if (parsedURL.pathname === '/sendMessage') {
@@ -50,20 +52,20 @@ const onRequest = (request, response) => {
       break;
     case 'GET':
       if (urlStruct[parsedURL.pathname]) {
-        urlStruct[parsedURL.pathname](request, response);
+        urlStruct[parsedURL.pathname](request, response, params);
       } else {
-        jsonHandler.notFound(request, response);
+        jsonHandler.notFound(request, response, params);
       }
       break;
     case 'HEAD':
       if (urlStruct[parsedURL.pathname]) {
-        urlStruct[parsedURL.pathname](request, response);
+        urlStruct[parsedURL.pathname](request, response, params);
       } else {
-        jsonHandler.notFoundMeta(request, response);
+        jsonHandler.notFoundMeta(request, response, params);
       }
       break;
     default:
-      jsonHandler.notFound(request, response);
+      jsonHandler.notFound(request, response, params);
       break;
   }
 };

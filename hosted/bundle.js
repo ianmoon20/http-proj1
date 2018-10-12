@@ -6,11 +6,7 @@
 * */
 var numMessages = 0;
 
-var preventDefaults = function preventDefaults(e) {
-    e.preventDefault();
-    e.stopPropagation();
-};
-
+//Parses json objects and places them on the client
 var parseJSON = function parseJSON(xhr, content, updating) {
     var obj = JSON.parse(xhr.response);
 
@@ -18,19 +14,6 @@ var parseJSON = function parseJSON(xhr, content, updating) {
     if (updating) {
         if (numMessages < obj.numMessages) {
             for (var x = numMessages; x < obj.numMessages; x++) {
-                /*const messageContainer = document.createElement('div');
-                messageContainer.className = "message";
-                const user = document.createElement('p');
-                user.className = "user";
-                user.textContent = `${obj[`${x+1}`].name} (${obj[`${x+1}`].time})`;
-                
-                  const p = document.createElement('p');
-                p.className = "content";
-                p.textContent = obj[`${x+1}`].messages;
-                  messageContainer.appendChild(user);
-                messageContainer.appendChild(p);
-                content.appendChild(messageContainer);
-                */
                 postMessage(content, obj["" + (x + 1)]);
             }
             //Incrementing the number of messages for comparison with the server when we decide if we need to update
@@ -45,28 +28,13 @@ var parseJSON = function parseJSON(xhr, content, updating) {
             numMessages = 0;
         }
     } else if (obj.name) {
-        /*const messageContainer = document.createElement('div');
-        messageContainer.className = "message";
-        
-        const user = document.createElement('p');
-        user.className = "user";
-        user.textContent = `${obj.name} (${obj.time})`;
-        
-        
-        const p = document.createElement('p');
-        p.className = "content";
-        p.textContent = obj.messages;
-        
-        messageContainer.appendChild(user);
-        messageContainer.appendChild(p);
-        content.appendChild(messageContainer);
-        */
         postMessage(content, obj);
         //Incrementing the number of messages for comparison with the server when we decide if we need to update
         numMessages += 1;
     }
 };
 
+//Handles objs and builds the message onto the page
 var postMessage = function postMessage(content, obj) {
     var messageContainer = document.createElement('div');
     messageContainer.className = "message";
@@ -82,6 +50,8 @@ var postMessage = function postMessage(content, obj) {
     messageContainer.appendChild(p);
     content.appendChild(messageContainer);
 };
+
+//Handles the various request forms
 var handleResponse = function handleResponse(xhr, parseResponse, updating) {
     var messageArea = document.querySelector('#item1');
 
@@ -94,6 +64,7 @@ var handleResponse = function handleResponse(xhr, parseResponse, updating) {
     }
 };
 
+//Handles sending post requests to the server
 var sendPost = function sendPost(e, messageForm) {
     var usernameField = messageForm.querySelector('#nameField');
     var messageField = messageForm.querySelector('#messageField');
@@ -139,6 +110,7 @@ var sendPost = function sendPost(e, messageForm) {
     return false;
 };
 
+//Handles server polling and keeping clients updated
 var requestUpdate = function requestUpdate() {
     var xhr = new XMLHttpRequest();
 
