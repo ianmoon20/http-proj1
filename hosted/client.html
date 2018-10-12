@@ -17,15 +17,15 @@
         <div id="item1">
             <div class="message">
                 <p class="user">Server</p>
-                <p class="content">Send a message by filing in the text boxes below and hitting send!
+                <p class="content">Send a message by filling in the text boxes below and hitting send!
                 </p>
             </div>
         </div>
         <div id="item2">
             <div id="formContainer">
                 <form id="messageForm" action="/sendMessage" method="post">
-                    <textarea id="nameField" type="text" name="name" placeholder="Username..." maxlength="12" required></textarea>
-                    <textarea id="messageField" type="text" name="message" placeholder="Message..." rows="2" cols="50" maxlength="140" required></textarea>
+                    <input type="text" id="nameField" name="name" placeholder="Username..." maxlength="12" required pattern="[A-Za-z0-9]+">
+                    <input type="text" id="messageField" name="name" placeholder="Message..." maxlength="240" required>
                     <input id="submitButton" type="submit" value="Send">
                 </form>
             </div>

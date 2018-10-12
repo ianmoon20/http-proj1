@@ -57,13 +57,11 @@ html,
             border-radius: 5px;
             outline: none;
         }
-        textarea {
+        #nameField, #messageField {
             border: none;
             background: none;
             border-bottom: 2px solid lightgray;
             resize: none;
-        }
-        #nameField {
             grid-column: 2 / 2;
         }
         #messageField {

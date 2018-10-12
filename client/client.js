@@ -16,7 +16,7 @@ const parseJSON = (xhr, content, updating) => {
     if(updating) {
         if(numMessages < obj.numMessages) {
             for(let x = numMessages; x < obj.numMessages; x++) {
-                const messageContainer = document.createElement('div');
+                /*const messageContainer = document.createElement('div');
                 messageContainer.className = "message";
                 const user = document.createElement('p');
                 user.className = "user";
@@ -30,6 +30,8 @@ const parseJSON = (xhr, content, updating) => {
                 messageContainer.appendChild(user);
                 messageContainer.appendChild(p);
                 content.appendChild(messageContainer);
+                */
+                postMessage(content, obj[`${x+1}`]);
             }
             //Incrementing the number of messages for comparison with the server when we decide if we need to update
             numMessages = numMessages + (obj.numMessages-numMessages);
@@ -43,7 +45,7 @@ const parseJSON = (xhr, content, updating) => {
             numMessages = 0;
         }
     } else if(obj.name) {
-        const messageContainer = document.createElement('div');
+        /*const messageContainer = document.createElement('div');
         messageContainer.className = "message";
         
         const user = document.createElement('p');
@@ -58,11 +60,29 @@ const parseJSON = (xhr, content, updating) => {
         messageContainer.appendChild(user);
         messageContainer.appendChild(p);
         content.appendChild(messageContainer);
+        */
+        postMessage(content, obj);
         //Incrementing the number of messages for comparison with the server when we decide if we need to update
-        numMessages += 1;
+        numMessages += 1
     }
 };
 
+const postMessage = (content, obj) => {
+    const messageContainer = document.createElement('div');
+    messageContainer.className = "message";
+    const user = document.createElement('p');
+    user.className = "user";
+    user.textContent = `${obj.name} (${obj.time})`;
+
+
+    const p = document.createElement('p');
+    p.className = "content";
+    p.textContent = obj.messages;
+
+    messageContainer.appendChild(user);
+    messageContainer.appendChild(p);
+    content.appendChild(messageContainer);
+}
 const handleResponse = (xhr, parseResponse, updating) => {
     const messageArea = document.querySelector('#item1');
     
